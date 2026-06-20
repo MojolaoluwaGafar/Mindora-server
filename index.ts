@@ -10,6 +10,7 @@ dotenv.config()
 const app : Application = express()
 
 
+app.use(express.json());
 const allowedOrigins = new Set([
     "https://mindora-client-two.vercel.app",
     "http://localhost:5173",
@@ -25,9 +26,10 @@ app.use(
       }
     },
     credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization", "x-session-id"]
   })
 );
-app.use(express.json());
 
 app.get("/", (req : Request , res : Response)=>{  
     res.status(200).json({ success : true, message : "Mindora Server running..."})
