@@ -10,8 +10,9 @@ const app : Application = express()
 
 app.use(express.json())
 const allowedOrigins = [
+    "https://mindora-client-two.vercel.app",
     "http://localhost:5173",
-    "http://localhost:5174",
+    "http://localhost:5174"
 ]
 
 app.use(
