@@ -28,10 +28,20 @@ const app : Application = express()
 //   })
 // );
 app.use(express.json());
+const allowedOrigins = [
+  "https://mindora-client-two.vercel.app",
+  "http://localhost:5173",
+  "http://localhost:5174"
+];
+
 app.use(cors({
-  origin : "https://mindora-client-two.vercel.app",
-  credentials : true
+  origin: allowedOrigins,
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"]
 }));
+
+app.options("*", cors());
 
 app.get("/", (req : Request , res : Response)=>{  
     res.status(200).json({ success : true, message : "Mindora Server running..."})
