@@ -5,40 +5,78 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.sendMessage = void 0;
 const ai_1 = require("../Services/ai");
-const ChatSession_1 = __importDefault(require("../models/ChatSession"));
-const sendMessage = async (Req, Res) => {
-    console.log("sending message");
-    const sessionId = Req.headers["sessionid-xoxo"];
-    console.log("Headers received:", sessionId);
-    const { message } = Req.body;
-    if (!message) {
-        return Res.status(400).json({
-            error: true,
-            message: "Message is required"
-        });
-    }
-    if (!sessionId) {
-        return Res.status(400).json({
-            error: true,
-            message: "SessionId is required"
-        });
-    }
+const Flagged_1 = __importDefault(require("../models/Flagged"));
+const unsafe_1 = require("../utils/unsafe");
+const emergency_1 = require("../utils/emergency");
+const sendMessage = async (req, res) => {
+    // console.log("SEND MESSAGE HIT");
+    // console.log("SESSION:", (req as any).session);
+    // console.log("Request body:", req.body);
     try {
-        let session = await ChatSession_1.default.findOne({ sessionId });
+        const { message } = req.body;
+        if (!message) {
+            return res.status(400).json({
+                error: true,
+                message: "Message is required",
+            });
+        }
+        const session = req.session;
         if (!session) {
-            session = new ChatSession_1.default({ sessionId, messages: [] });
+            return res.status(500).json({
+                success: false,
+                message: "Session not attached to request",
+            });
+        }
+        const unsafeReason = (0, unsafe_1.getUnsafeReason)(message);
+        const emergency = (0, emergency_1.isEmergency)(message);
+        if (emergency) {
+            await Flagged_1.default.create({
+                sessionId: session.sessionId,
+                message,
+                reason: "Emergency Self-Harm Risk",
+            });
+            // console.log("emergency text from user :",emergency);
+            const emergencyReply = "It sounds like you may be going through something very serious right now. Please reach out to a trusted adult, family member, local emergency service, or mental health professional immediately.";
+            session.messages.push({
+                sender: "user",
+                text: message,
+            });
+            session.messages.push({
+                sender: "ai",
+                text: emergencyReply,
+            });
+            await session.save();
+            return res.status(200).json({
+                reply: emergencyReply,
+                history: session.messages,
+            });
+        }
+        else if (unsafeReason) {
+            await Flagged_1.default.create({
+                sessionId: session.sessionId,
+                message,
+                reason: unsafeReason,
+            });
         }
         const reply = await (0, ai_1.sendToAI)(message);
-        session.messages.push({ sender: "user", text: message });
-        session.messages.push({ sender: "ai", text: reply });
-        session.expiresAt = new Date(Date.now() + 60 * 60 * 1000);
+        session.messages.push({
+            sender: "user",
+            text: message,
+        });
+        session.messages.push({
+            sender: "ai",
+            text: reply,
+        });
         await session.save();
-        Res.json({ reply, history: session.messages });
+        return res.json({
+            reply,
+            history: session.messages,
+        });
     }
     catch (error) {
         console.error(error);
-        Res.status(500).json({
-            error: "AI integration failed"
+        return res.status(500).json({
+            error: "AI integration failed",
         });
     }
 };

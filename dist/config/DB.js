@@ -14,7 +14,7 @@ async function connectDB() {
             throw new Error("DB_CONNECTION_URL is not defined");
         }
         await mongoose_1.default.connect(dbUrl);
-        console.log("MongoDB connected successfully");
+        // console.log("MongoDB connected successfully");
     }
     catch (error) {
         console.error("MongoDB connection failed: ", error);

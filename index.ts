@@ -11,43 +11,43 @@ const app : Application = express()
 
 
 app.use(express.json());
-app.use(
-  cors({
-    origin: true,
-    credentials: true,
-  })
-);
-
-// const allowedOrigins = [
-//   "https://mindora-client-two.vercel.app",
-//   "http://localhost:5173",
-//   "http://localhost:5174",
-// ];
-
 // app.use(
 //   cors({
-//     origin: (origin, callback) => {
-//       console.log("CORS Origin:", origin);
-
-//       if (!origin) {
-//         return callback(null, true);
-//       }
-
-//       if (allowedOrigins.includes(origin)) {
-//         return callback(null, true);
-//       }
-
-//       return callback(null, false);
-//     },
+//     origin: true,
 //     credentials: true,
-//     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-//     allowedHeaders: [
-//       "Content-Type",
-//       "Authorization",
-//       "x-session-id",
-//     ],
 //   })
 // );
+
+const allowedOrigins = [
+  "https://mindora-client-two.vercel.app",
+  "http://localhost:5173",
+  "http://localhost:5174",
+];
+
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      console.log("CORS Origin:", origin);
+
+      if (!origin) {
+        return callback(null, true);
+      }
+
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+
+      return callback(null, false);
+    },
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: [
+      "Content-Type",
+      "Authorization",
+      "x-session-id",
+    ],
+  })
+);
 
 app.get("/", (req : Request , res : Response)=>{  
     res.status(200).json({ success : true, message : "Mindora Server running..."})
