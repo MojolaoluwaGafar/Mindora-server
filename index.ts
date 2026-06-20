@@ -40,6 +40,10 @@ app.use(express.json());
 //   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
 //   allowedHeaders: ["Content-Type", "Authorization"]
 // }));
+// app.use(cors({
+//   origin : "https://mindora-client-two.vercel.app",
+//   credentials : true
+// }));
 app.use(cors());
 app.get("/", (req : Request , res : Response)=>{  
     res.status(200).json({ success : true, message : "Mindora Server running..."})
