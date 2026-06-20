@@ -3,8 +3,10 @@ import dotenv from 'dotenv'
 import cors from "cors"
 import connectDB from "./config/DB"
 import chatRouter from "./routes/chat"
-
+import { initGroqModels } from "./Services/fetchModels"
 dotenv.config()
+
+
 const app : Application = express()
 
 
@@ -27,8 +29,6 @@ app.use(
 );
 app.use(express.json())
 
-
-app.options("*", cors());
 app.get("/", (req : Request , res : Response)=>{  
     res.status(200).json({ success : true, message : "Mindora Server running..."})
 })
@@ -36,8 +36,8 @@ app.use("/api", chatRouter);
 
 const startServer = async () => {
     try {
-        connectDB()
-    
+        connectDB();
+        initGroqModels();
         // console.log("starting server");
         const PORT : string | undefined = process.env.PORT
         app.listen(PORT, ()=>{

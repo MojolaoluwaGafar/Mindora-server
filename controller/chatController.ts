@@ -7,7 +7,7 @@ import { isEmergency } from "../utils/emergency";
 export const sendMessage = async (req: Request, res: Response) => {
     // console.log("SEND MESSAGE HIT");
     // console.log("SESSION:", (req as any).session);
-
+    // console.log("Request body:", req.body);
   try {
     const { message } = req.body;
 

@@ -6,7 +6,8 @@
     "rootDir": ".",
     "strict": true,
     "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true
+    "forceConsistentCasingInFileNames": true,
+    "types" : ["node"]
   },
   "include": ["**/*.ts"]
 }
